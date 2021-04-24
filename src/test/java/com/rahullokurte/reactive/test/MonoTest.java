@@ -2,7 +2,6 @@ package com.rahullokurte.reactive.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.reactivestreams.Subscription;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -45,5 +44,20 @@ public class MonoTest {
         StepVerifier.create(mono)
                 .expectError(RuntimeException.class)
                 .verify();
+    }
+
+    @Test
+    void monoSubscriberSubscription() {
+        String name = "Rahul Lokurte";
+        Mono<String> mono = Mono.just(name).log();
+        mono.subscribe(s -> log.info("name: {}",s),
+                s-> log.info("some error"),
+                () -> log.info("FINISHED"),
+                subscription -> subscription.request(2));
+        log.info("---------------");
+
+        StepVerifier.create(mono)
+                .expectNext(name)
+                .verifyComplete();
     }
 }
